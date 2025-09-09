@@ -66,6 +66,10 @@ input {
     color: #888;
 }
 
+.timer-display--warmup {
+    color: #2196F3;
+}
+
 .reps-display {
     font-size: 2rem;
     margin-top: 1rem;
