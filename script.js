@@ -48,7 +48,7 @@ function playEndSound() {
 }
 
 let timerId;
-let currentState = 'idle'; // idle, exercise, rest
+let currentState = 'idle'; // idle, warmup, exercise, rest
 let currentRep = 0;
 let remainingTime = 0;
 
@@ -66,6 +66,8 @@ function updateDisplay() {
     timerDisplay.textContent = formatTime(remainingTime);
     if (currentState === 'idle') {
         repsDisplay.textContent = '';
+    } else if (currentState === 'warmup') {
+        repsDisplay.textContent = 'Warmup';
     } else {
         repsDisplay.textContent = `Round ${currentRep} / ${reps}`;
     }
@@ -76,14 +78,13 @@ function tick() {
 
     if (remainingTime === 0) {
         playEndSound();
-    } else if (remainingTime > 0) {
-        playTick();
-    }
 
-    remainingTime--;
-
-    if (remainingTime < 0) {
-        if (currentState === 'exercise') {
+        if (currentState === 'warmup') {
+            currentState = 'exercise';
+            currentRep = 1;
+            remainingTime = exerciseDuration;
+            timerDisplay.classList.remove('timer-display--warmup');
+        } else if (currentState === 'exercise') {
             if (currentRep >= reps) {
                 stopTimer();
                 timerDisplay.textContent = "Done!";
@@ -101,7 +102,11 @@ function tick() {
             timerDisplay.classList.remove('timer-display--rest');
         }
         updateDisplay();
+    } else {
+        playTick();
     }
+
+    remainingTime--;
 }
 
 function startTimer() {
@@ -110,10 +115,9 @@ function startTimer() {
         reps = parseInt(repsInput.value);
         restDuration = parseInt(restDurationInput.value);
 
-        currentState = 'exercise';
-        currentRep = 1;
-        remainingTime = exerciseDuration;
-        timerDisplay.classList.remove('timer-display--rest');
+        currentState = 'warmup';
+        remainingTime = 7;
+        timerDisplay.classList.add('timer-display--warmup');
         updateDisplay();
     }
 
@@ -132,6 +136,7 @@ function resetTimer() {
     currentRep = 0;
     remainingTime = parseInt(exerciseDurationInput.value);
     timerDisplay.classList.remove('timer-display--rest');
+    timerDisplay.classList.remove('timer-display--warmup');
     updateDisplay();
 }
 
